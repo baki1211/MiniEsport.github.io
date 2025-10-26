@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Esport</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #8a2be2;
+            --secondary-color: #1a1a1a;
+            --accent-color: #9c4dff;
+            --text-color: #f0f0f0;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* Duyuru Çubuğu */
+        .announcement-bar {
+            background: #ff0000;
+            color: white;
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1001;
+            display: none;
+        }
+
+        /* Özel Duyuru */
+        .special-announcement {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            background: rgba(138, 43, 226, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .special-announcement:hover {
+            transform: scale(1.05);
+        }
+
+        .special-announcement h3 {
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px var(--primary-color); }
+            50% { text-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--accent-color); }
+            100% { text-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50% { border-color: var(--primary-color); }
+        }
+
+        /* Header ve Navigasyon */
+        header {
+            background-color: rgba(26, 26, 26, 0.9);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            top: 0;
+        }
+
+        .has-announcement header {
+            top: 40px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            animation: glow 3s infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Bölümü */
+        .hero {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #2d1b4e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .has-announcement .hero {
+            height: calc(100vh - 40px);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><polygon fill="%238a2be2" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.7);
+            animation: pulse 3s infinite;
+            overflow: hidden;
+            border-right: 3px solid var(--primary-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typewriter 3s steps(20) 1s 1 normal both, blink 0.75s step-end infinite;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            margin: 1rem auto 0;
+            animation: fadeIn 2s ease-out 2s both;
+        }
+
+        /* Bölümler */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background-color: var(--primary-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Kadro Bölümü */
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-member {
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 1s ease-out;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .team-member.owner {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .member-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .owner .member-icon {
+            color: gold;
+        }
+
+        .member-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-role {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Hakkımızda Bölümü */
+        .about-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .about-staff {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+            padding: 2rem;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .staff-list {
+            list-style: none;
+        }
+
+        .staff-list li {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .staff-list li:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .staff-role {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .youtube-link {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 2rem;
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .youtube-link:hover {
+            color: #ff3333;
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .youtube-link i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: rgba(10, 10, 10, 0.9);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .copyright {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive Tasarım */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .special-announcement {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Duyuru Çubuğu -->
+    <div class="announcement-bar" id="announcementBar">
+        <span id="announcementText">Duyuru: </span>
+    </div>
+
+    <!-- Özel Duyuru -->
+    <div class="special-announcement" id="specialAnnouncement">
+        <h3>Özel Duyuru</h3>
+        <p id="specialAnnouncementText"></p>
+    </div>
+
+    <!-- Header ve Navigasyon -->
+    <header>
+        <nav>
+            <div class="logo">Mini Esport</div>
+            <ul class="nav-links">
+                <li><a href="#home">Ana Sayfa</a></li>
+                <li><a href="#team">Kadro</a></li>
+                <li><a href="#about">Hakkımızda</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Bölümü -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 id="team-name">Mini Team</h1>
+            <p>Profesyonel Esport Ekibi</p>
+        </div>
+    </section>
+
+    <!-- Kadro Bölümü -->
+    <section id="team">
+        <h2 class="section-title">Takım Kadrosu</h2>
+        <div class="team-container">
+            <div class="team-member owner">
+                <i class="fas fa-crown member-icon"></i>
+                <h3 class="member-name">Mini Emin</h3>
+                <p class="member-role">Owner</p>
+            </div>
+            <div class="team-member">
+                <i class="fas fa-gamepad member-icon"></i>
+                <h3 class="member-name">Mini Prens</h3>
+                <p class="member-role">Oyuncu</p>
+            </div>
+            <div class="team-member">
+                <i class="fas fa-gamepad member-icon"></i>
+                <h3 class="member-name">Mini Moon</h3>
+                <p class="member-role">Oyuncu</p>
+            </div>
+            <div class="team-member">
+                <i class="fas fa-gamepad member-icon"></i>
+                <h3 class="member-name">Mini Tun</h3>
+                <p class="member-role">Oyuncu</p>
+            </div>
+            <div class="team-member">
+                <i class="fas fa-gamepad member-icon"></i>
+                <h3 class="member-name">Mini Emre</h3>
+                <p class="member-role">Oyuncu</p>
+            </div>
+            <div class="team-member">
+                <i class="fas fa-gamepad member-icon"></i>
+                <h3 class="member-name">Mini Hanım</h3>
+                <p class="member-role">Oyuncu</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hakkımızda Bölümü -->
+    <section id="about">
+        <h2 class="section-title">Hakkımızda</h2>
+        <div class="about-container">
+            <div class="about-text">
+                <h3>Lider: Mini Emin</h3>
+                <p>Esport Takımı: Mini Emin, Mini Prens, Mini Moon, Mini Tun, Mini Emre, Mini Hanım</p>
+                
+                <a href="https://www.youtube.com/@EMİNGAMİNG-01" class="youtube-link" target="_blank">
+                    <i class="fab fa-youtube"></i> YouTube Kanalımız
+                </a>
+            </div>
+            <div class="about-staff">
+                <h3>Ekibimiz</h3>
+                <ul class="staff-list">
+                    <li><span class="staff-role">Editor:</span> Mini Baki</li>
+                    <li><span class="staff-role">Discord Admin:</span> Mini Baki</li>
+                    <li><span class="staff-role">Web Site Coder:</span> Mini Baki</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="copyright">
+            <i class="far fa-copyright"></i>
+            <span>2025 Mini Esport. Tüm hakları saklıdır.</span>
+        </div>
+    </footer>
+
+    <script>
+        // Sayfa yüklendiğinde animasyonları başlat ve duyuruları kontrol et
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hero bölümündeki Mini Team yazısına animasyon ekle
+            const teamName = document.getElementById('team-name');
+            teamName.style.opacity = '0';
+            teamName.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                teamName.style.transition = 'opacity 1s ease, transform 1s ease';
+                teamName.style.opacity = '1';
+                teamName.style.transform = 'translateY(0)';
+            }, 500);
+            
+            // Takım üyelerine sıralı animasyon ekle
+            const teamMembers = document.querySelectorAll('.team-member');
+            teamMembers.forEach((member, index) => {
+                member.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            // Navigasyon linklerine tıklama olayı ekle
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Duyuruları kontrol et
+            checkAnnouncements();
+            
+            // Her 5 saniyede bir duyuruları kontrol et
+            setInterval(checkAnnouncements, 5000);
+        });
+
+        function checkAnnouncements() {
+            // Duyuruları al
+            const announcements = JSON.parse(localStorage.getItem('announcements') || '[]');
+            
+            // Site duyurularını kontrol et (en son eklenen site duyurusu)
+            const siteAnnouncements = announcements.filter(a => a.type === 'site');
+            const latestSiteAnnouncement = siteAnnouncements[siteAnnouncements.length - 1];
+            
+            const announcementBar = document.getElementById('announcementBar');
+            const announcementText = document.getElementById('announcementText');
+            
+            if (latestSiteAnnouncement) {
+                announcementText.textContent = `Duyuru: ${latestSiteAnnouncement.text}`;
+                announcementBar.style.display = 'block';
+                document.body.classList.add('has-announcement');
+            } else {
+                announcementBar.style.display = 'none';
+                document.body.classList.remove('has-announcement');
+            }
+            
+            // Özel duyuruları kontrol et (en son eklenen özel duyuru)
+            const specialAnnouncements = announcements.filter(a => a.type === 'special');
+            const latestSpecialAnnouncement = specialAnnouncements[specialAnnouncements.length - 1];
+            
+            const specialAnnouncement = document.getElementById('specialAnnouncement');
+            const specialAnnouncementText = document.getElementById('specialAnnouncementText');
+            
+            if (latestSpecialAnnouncement) {
+                specialAnnouncementText.textContent = latestSpecialAnnouncement.text;
+                specialAnnouncement.style.display = 'block';
+            } else {
+                specialAnnouncement.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
